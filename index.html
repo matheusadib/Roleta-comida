@@ -21,7 +21,8 @@
     "react": "https://esm.sh/react@19.1.0",
     "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react/": "https://esm.sh/react@^19.1.0/"
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "canvas-confetti": "https://esm.sh/canvas-confetti@1.9.3"
   }
 }
 </script>
@@ -31,12 +32,13 @@
     <div id="root"></div>
 
     <script type="module">
-      import React, { useState, useCallback } from 'react';
+      import React, { useState, useCallback, useEffect } from 'react';
       import ReactDOM from 'react-dom/client';
+      import confetti from 'canvas-confetti';
 
       // --- Start of constants.ts content ---
       const FOOD_OPTIONS = [
-          'Gourmet', 'Árabe', 'Macarrãozinho', 'Poke', 
+          'Fazer em Casa', 'Árabe', 'Macarrãozinho', 'Poke', 
           'Sushi Vegetariano', 'Hambúrguer', 'Pizza', 'Quitanda'
       ];
 
@@ -82,8 +84,8 @@
           React.createElement('div', {
             className: `
               mt-8 text-2xl font-medium text-gray-700 h-[35px] min-h-[1em]
-              transition-opacity duration-700 ease-in-out
-              ${winningOptionText ? 'opacity-100' : 'opacity-0'}
+              transition-all duration-700 ease-in-out
+              ${winningOptionText ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}
             `,
             'aria-live': "polite"
           },
@@ -188,7 +190,7 @@
           if (isSpinning) return;
 
           setIsSpinning(true);
-          setWinningOptionText(null);
+          setWinningOptionText(null); // Clear previous result for animation
 
           const winningOptionIndex = Math.floor(Math.random() * numOptions);
           const winningOption = options[winningOptionIndex];
@@ -205,12 +207,21 @@
           setTimeout(() => {
             setWinningOptionText(winningOption);
             setIsSpinning(false);
-          }, SPIN_DURATION_SECONDS * 1000);
+            
+            // Trigger confetti
+            confetti({
+              particleCount: 150,
+              spread: 90,
+              origin: { y: 0.6 },
+              zIndex: 1000 // Ensure confetti is above other elements
+            });
+
+          }, SPIN_DURATION_SECONDS * 1000 + 100); // Small delay to sync with CSS transition end
 
         }, [isSpinning, options, numOptions, anglePerOption, currentRotationDeg]);
 
         return (
-          React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 text-center select-none" },
+          React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 text-center select-none overflow-hidden" }, // Added overflow-hidden to body container
             React.createElement('h1', { className: "text-3xl sm:text-4xl font-bold text-gray-800 mb-8 tracking-tight" }, "O que eu devo comer?"),
             React.createElement('div', {
               className: "relative flex items-center justify-center mb-10",
