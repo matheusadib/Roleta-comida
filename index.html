@@ -3,229 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Que Comer Hoje?</title>
+    <title>O Que Comer Hoje? - Roleta React</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f7f7f7;
-            /* Removemos o container para um visual mais limpo */
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #333;
-            font-weight: 700;
-            font-size: 2.2rem;
-            margin-bottom: 30px;
-        }
-
-        .roleta-container {
-            position: relative;
-            width: 320px;
-            height: 320px;
-        }
-        
-        /* 1. CORREÇÃO: A seta agora fica fixa no topo */
-        .ponteiro {
-            position: absolute;
-            top: -10px; /* Posiciona acima da roleta */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            /* Cria um triângulo apontando para baixo */
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid #e67e22; /* Laranja da imagem */
-            z-index: 10;
-        }
-
-        #roleta {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            /* Sombra sutil para dar profundidade, como na imagem */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            position: relative;
-            overflow: hidden; /* Garante que nada saia do círculo */
-        }
-        
-        /* 2. CORREÇÃO: Nova técnica para posicionar o texto */
-        .opcao {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: white;
-            font-weight: 500;
-            font-size: 15px;
-            /* Sombra no texto para melhor leitura, como na imagem */
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            
-            /* Posiciona o texto dentro da sua fatia */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-left: 55%; /* Empurra o texto para a borda da roleta */
-            transform-origin: center;
-            transform: rotate(var(--angulo));
-        }
-        
-        #botao-girar {
-            margin-top: 40px;
-            padding: 15px 50px;
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            background-color: #3498db; /* Azul da imagem */
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        #botao-girar:hover {
-            background-color: #2980b9;
-        }
-
-        #botao-girar:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        
-        #resultado-container {
-            margin-top: 30px;
-            font-size: 24px;
-            font-weight: 700;
-            color: #e67e22; /* Laranja da imagem */
-            height: 35px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
+      body {
+        font-family: 'Poppins', sans-serif;
+        /* Tailwind's bg-gray-100 will take precedence */
+      }
+      /* Additional global styles if needed can go here */
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.1.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
+  }
+}
+</script>
 </head>
-<body>
+<body class="bg-gray-100">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
 
-    <div class="app-container">
-        <h1>O QUE EU DEVO COMER?</h1>
+    <script type="module">
+      import React, { useState, useCallback } from 'react';
+      import ReactDOM from 'react-dom/client';
 
-        <div class="roleta-container">
-            <div class="ponteiro"></div>
-            <div id="roleta">
-                <!-- As opções e fatias serão geradas pelo JavaScript -->
-            </div>
-        </div>
+      // --- Start of constants.ts content ---
+      const FOOD_OPTIONS = [
+          'Gourmet', 'Árabe', 'Macarrãozinho', 'Poke', 
+          'Sushi Vegetariano', 'Hambúrguer', 'Pizza', 'Quitanda'
+      ];
 
-        <button id="botao-girar">GIRAR</button>
+      const SEGMENT_COLORS = [
+          '#EF4444', // Red 500
+          '#3B82F6', // Blue 500
+          '#10B981', // Emerald 500
+          '#F59E0B', // Amber 500
+          '#8B5CF6', // Violet 500
+          '#EC4899', // Pink 500
+          '#6366F1', // Indigo 500
+          '#F97316'  // Orange 500
+      ];
 
-        <div id="resultado-container"></div>
-    </div>
+      const POINTER_COLOR = '#DC2626'; // Red 600
+      const ROULETTE_SIZE_PX = 340;
+      const SPIN_DURATION_SECONDS = 6;
+      const EXTRA_ROTATIONS = 7;
+      // --- End of constants.ts content ---
 
-    <script>
-        const roleta = document.getElementById('roleta');
-        const botaoGirar = document.getElementById('botao-girar');
-        const resultadoContainer = document.getElementById('resultado-container');
+      // --- Start of components/SpinnerPointer.tsx content ---
+      const SpinnerPointer = () => {
+        return (
+          React.createElement('div', {
+            className: "absolute top-[-15px] left-1/2 -translate-x-1/2 z-[11]",
+            style: {
+              width: 0,
+              height: 0,
+              borderLeft: '18px solid transparent',
+              borderRight: '18px solid transparent',
+              borderTop: `30px solid ${POINTER_COLOR}`,
+              filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.3))'
+            },
+            'aria-hidden': "true"
+          })
+        );
+      };
+      // --- End of components/SpinnerPointer.tsx content ---
 
-        // ==========================================================
-        // ====>   VOCÊ PODE EDITAR AS OPÇÕES DE COMIDA AQUI   <====
-        // ==========================================================
-        // Coloquei as opções da sua imagem como exemplo inicial.
-        const opcoesDeComida = [
-            'Poke', 'Sushi Vegetariano', 'Hambúrguer', 'Pizza', 'Quitanda', 'Gourmet', 'Árabe', 'Macarrãozinho'
-        ];
-        
-        // Cores baseadas na sua imagem
-        const cores = [
-            '#e67e22', '#9b59b6', '#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#34495e', '#1abc9c'
-        ];
+      // --- Start of components/ResultDisplay.tsx content ---
+      const ResultDisplay = ({ winningOptionText }) => {
+        return (
+          React.createElement('div', {
+            className: `
+              mt-8 text-2xl font-medium text-gray-700 h-[35px] min-h-[1em]
+              transition-opacity duration-700 ease-in-out
+              ${winningOptionText ? 'opacity-100' : 'opacity-0'}
+            `,
+            'aria-live': "polite"
+          },
+          winningOptionText ? (
+            React.createElement(React.Fragment, null,
+              "A escolha é... ",
+              React.createElement('span', {
+                style: { color: POINTER_COLOR },
+                className: "font-bold tracking-wide"
+              }, winningOptionText + "!")
+            )
+          ) : (
+            React.createElement('span', null, "\u00A0") // &nbsp;
+          ))
+        );
+      };
+      // --- End of components/ResultDisplay.tsx content ---
 
-        function criarRoleta() {
-            const numOpcoes = opcoesDeComida.length;
-            const anguloPorOpcao = 360 / numOpcoes;
-            let gradiente = 'conic-gradient(';
-            
-            roleta.innerHTML = '';
-            
-            opcoesDeComida.forEach((opcao, i) => {
-                const cor = cores[i % cores.length];
-                const anguloInicial = i * anguloPorOpcao;
-                const anguloFinal = anguloInicial + anguloPorOpcao;
-                
-                gradiente += `${cor} ${anguloInicial}deg ${anguloFinal}deg, `;
-                
-                // Cria o elemento de texto para a opção
-                const elementoOpcao = document.createElement('div');
-                elementoOpcao.classList.add('opcao');
-                // O ângulo de rotação do texto é o meio da sua fatia
-                const anguloTexto = anguloInicial + (anguloPorOpcao / 2);
-                elementoOpcao.style.setProperty('--angulo', `${anguloTexto}deg`);
-                elementoOpcao.textContent = opcao;
-                roleta.appendChild(elementoOpcao);
-            });
-            
-            roleta.style.backgroundImage = gradiente.slice(0, -2) + ')';
-        }
+      // --- Start of components/SpinButton.tsx content ---
+      const SpinButton = ({ onClick, disabled, text = "GIRAR" }) => {
+        return (
+          React.createElement('button', {
+            onClick: onClick,
+            disabled: disabled,
+            type: "button",
+            className: `
+              py-3.5 px-14 text-lg font-bold text-white rounded-full
+              transition-all duration-300 ease-in-out transform active:scale-95
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3498db] focus:ring-opacity-75
+              shadow-lg hover:shadow-xl
+              bg-[#3498db] hover:bg-[#2980b9] 
+              disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:shadow-md disabled:transform-none
+            `
+          }, text)
+        );
+      };
+      // --- End of components/SpinButton.tsx content ---
 
-        let rotacaoAtual = 0;
-        let girando = false;
+      // --- Start of components/RouletteWheel.tsx content ---
+      const RouletteWheel = ({ options, colors, currentRotationDeg }) => {
+        const numOptions = options.length;
+        const anglePerOption = 360 / numOptions;
 
-        botaoGirar.addEventListener('click', () => {
-            if (girando) return;
-            
-            girando = true;
-            botaoGirar.disabled = true;
-            resultadoContainer.style.opacity = 0;
-            
-            const voltasExtras = 360 * 5;
-            const anguloAleatorio = Math.floor(Math.random() * 360);
-            
-            rotacaoAtual += voltasExtras + anguloAleatorio;
-            
-            roleta.style.transform = `rotate(${rotacaoAtual}deg)`;
+        const generateConicGradient = () => {
+          let gradient = 'conic-gradient(';
+          options.forEach((_, i) => {
+            const color = colors[i % colors.length];
+            const startAngle = i * anglePerOption;
+            const endAngle = startAngle + anglePerOption;
+            gradient += `${color} ${startAngle}deg ${endAngle}deg, `;
+          });
+          return gradient.slice(0, -2) + ')';
+        };
 
-            setTimeout(() => {
-                // 3. CORREÇÃO: Nova fórmula para calcular o vencedor com precisão
-                const anguloPorOpcao = 360 / opcoesDeComida.length;
-                const anguloFinal = rotacaoAtual % 360;
-                
-                // O ponteiro está no topo (270 graus no círculo trigonométrico)
-                const anguloDoPonteiro = 270;
-                
-                // Calcula qual ângulo da roleta parou sob o ponteiro
-                const anguloVencedor = (360 - anguloFinal + anguloDoPonteiro) % 360;
-                
-                // Encontra o índice correspondente no array
-                const indiceVencedor = Math.floor(anguloVencedor / anguloPorOpcao);
-                const opcaoVencedora = opcoesDeComida[indiceVencedor];
-                
-                resultadoContainer.textContent = `A escolha é... ${opcaoVencedora}!`;
-                resultadoContainer.style.opacity = 1;
+        return (
+          React.createElement('div', {
+            className: "relative rounded-full shadow-xl border-8 border-white overflow-hidden",
+            style: {
+              width: `${ROULETTE_SIZE_PX}px`,
+              height: `${ROULETTE_SIZE_PX}px`,
+              backgroundImage: generateConicGradient(),
+              transform: `rotate(${currentRotationDeg}deg)`,
+              transition: `transform ${SPIN_DURATION_SECONDS}s cubic-bezier(0.25, 1, 0.5, 1)`,
+            }
+          },
+          options.map((option, i) => {
+            const segmentMidAngle = i * anglePerOption + anglePerOption / 2;
+            const cssRotationAngle = 90 - segmentMidAngle;
 
-                botaoGirar.disabled = false;
-                girando = false;
+            return (
+              React.createElement('div', {
+                key: `${option}-${i}`,
+                className: "absolute top-0 left-0 w-full h-full origin-center",
+                style: { transform: `rotate(${cssRotationAngle}deg)` }
+              },
+              React.createElement('div', {
+                className: "absolute top-[18px] left-1/2 -translate-x-1/2 text-white font-medium text-[13px] text-center",
+                style: {
+                  width: '100px',
+                  lineHeight: '1.25',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+                }
+              }, option))
+            );
+          }))
+        );
+      };
+      // --- End of components/RouletteWheel.tsx content ---
 
-            }, 5000); // 5000ms = 5 segundos (mesmo tempo da transição no CSS)
-        });
+      // --- Start of App.tsx content ---
+      const App = () => {
+        const [currentRotationDeg, setCurrentRotationDeg] = useState(0);
+        const [isSpinning, setIsSpinning] = useState(false);
+        const [winningOptionText, setWinningOptionText] = useState(null);
 
-        // Inicia a roleta
-        criarRoleta();
+        const options = FOOD_OPTIONS;
+        const colors = SEGMENT_COLORS;
+        const numOptions = options.length;
+        const anglePerOption = 360 / numOptions;
+
+        const handleSpin = useCallback(() => {
+          if (isSpinning) return;
+
+          setIsSpinning(true);
+          setWinningOptionText(null);
+
+          const winningOptionIndex = Math.floor(Math.random() * numOptions);
+          const winningOption = options[winningOptionIndex];
+          
+          const angleOnWheel_ccw = (winningOptionIndex * anglePerOption) + (anglePerOption / 2);
+          const pointerPositionScreen_ccw = 90; 
+          const finalWheelOrientation_cw = (angleOnWheel_ccw - pointerPositionScreen_ccw + 360) % 360;
+          const currentWheelOrientation_cw = currentRotationDeg % 360;
+          const incrementalSpin_cw = (finalWheelOrientation_cw - currentWheelOrientation_cw + 360) % 360;
+          const newTotalRotationDeg = currentRotationDeg + (EXTRA_ROTATIONS * 360) + incrementalSpin_cw;
+
+          setCurrentRotationDeg(newTotalRotationDeg);
+
+          setTimeout(() => {
+            setWinningOptionText(winningOption);
+            setIsSpinning(false);
+          }, SPIN_DURATION_SECONDS * 1000);
+
+        }, [isSpinning, options, numOptions, anglePerOption, currentRotationDeg]);
+
+        return (
+          React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 text-center select-none" },
+            React.createElement('h1', { className: "text-3xl sm:text-4xl font-bold text-gray-800 mb-8 tracking-tight" }, "O que eu devo comer?"),
+            React.createElement('div', {
+              className: "relative flex items-center justify-center mb-10",
+              style: { width: `${ROULETTE_SIZE_PX}px`, height: `${ROULETTE_SIZE_PX}px` }
+            },
+              React.createElement(SpinnerPointer, null),
+              React.createElement(RouletteWheel, {
+                options: options,
+                colors: colors,
+                currentRotationDeg: currentRotationDeg
+              }),
+              React.createElement('div', {
+                className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[25px] h-[25px] bg-white rounded-full border-2 border-gray-300 shadow-md z-[12]"
+              })
+            ),
+            React.createElement(SpinButton, { onClick: handleSpin, disabled: isSpinning }),
+            React.createElement(ResultDisplay, { winningOptionText: winningOptionText })
+          )
+        );
+      };
+      // --- End of App.tsx content ---
+
+      // --- Start of index.tsx content (React DOM rendering) ---
+      const rootElement = document.getElementById('root');
+      if (!rootElement) {
+        throw new Error("Could not find root element to mount to");
+      }
+
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        React.createElement(React.StrictMode, null, React.createElement(App))
+      );
+      // --- End of index.tsx content ---
     </script>
-
 </body>
 </html>
