@@ -1,18 +1,13 @@
-<!-- CÓDIGO COMPLETO PARA O ARQUIVO index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O Que Comer Hoje?</title>
-    <!-- Importando uma fonte moderna do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* PARTE 1: O DESIGN (CSS) */
-        
-        /* Estilos gerais da página */
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
@@ -20,113 +15,106 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-color: #f7f7f7;
+            /* Removemos o container para um visual mais limpo */
         }
 
-        /* Contêiner principal do aplicativo */
         .app-container {
-            text-align: center;
-            background-color: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 30px;
             font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
         }
 
         .roleta-container {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
+            width: 320px;
+            height: 320px;
+        }
+        
+        /* 1. CORREÇÃO: A seta agora fica fixa no topo */
+        .ponteiro {
+            position: absolute;
+            top: -10px; /* Posiciona acima da roleta */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            /* Cria um triângulo apontando para baixo */
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #e67e22; /* Laranja da imagem */
+            z-index: 10;
         }
 
         #roleta {
             width: 100%;
             height: 100%;
-            border: 8px solid #fff;
             border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2) inset;
-            transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Sombra sutil para dar profundidade, como na imagem */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 5s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
+            overflow: hidden; /* Garante que nada saia do círculo */
         }
         
+        /* 2. CORREÇÃO: Nova técnica para posicionar o texto */
         .opcao {
             position: absolute;
             top: 0;
-            left: 50%;
-            height: 50%;
-            width: 50%;
-            transform-origin: 0% 100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: white;
+            font-weight: 500;
+            font-size: 15px;
+            /* Sombra no texto para melhor leitura, como na imagem */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            
+            /* Posiciona o texto dentro da sua fatia */
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            transform: rotate(calc(var(--angulo-fatia) / 2)) skewY(calc(90deg - var(--angulo-fatia)));
-            padding-right: 20px;
-            pointer-events: none; /* Evita que o texto interfira com cliques */
+            padding-left: 55%; /* Empurra o texto para a borda da roleta */
+            transform-origin: center;
+            transform: rotate(var(--angulo));
         }
         
-        .ponteiro {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -100%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-bottom: 35px solid #d35400;
-            z-index: 10;
-            filter: drop-shadow(0 -3px 2px rgba(0,0,0,0.2));
-        }
-
         #botao-girar {
             margin-top: 40px;
-            padding: 15px 40px;
+            padding: 15px 50px;
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
             color: white;
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background-color: #3498db; /* Azul da imagem */
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(44, 130, 201, 0.4);
-        }
-
-        #botao-girar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(44, 130, 201, 0.5);
-        }
-
-        #botao-girar:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(44, 130, 201, 0.4);
+            transition: all 0.2s ease;
         }
         
+        #botao-girar:hover {
+            background-color: #2980b9;
+        }
+
         #botao-girar:disabled {
-            background: #bdc3c7;
-            box-shadow: none;
+            background-color: #95a5a6;
             cursor: not-allowed;
-            transform: translateY(0);
         }
         
         #resultado-container {
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: 600;
-            color: #d35400;
-            height: 30px;
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #e67e22; /* Laranja da imagem */
+            height: 35px;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
@@ -134,25 +122,21 @@
 </head>
 <body>
 
-    <!-- PARTE 2: A ESTRUTURA (HTML) -->
     <div class="app-container">
         <h1>O QUE EU DEVO COMER?</h1>
 
         <div class="roleta-container">
-            <div id="roleta">
-                <!-- Os nomes das comidas serão inseridos aqui pelo JavaScript -->
-            </div>
             <div class="ponteiro"></div>
+            <div id="roleta">
+                <!-- As opções e fatias serão geradas pelo JavaScript -->
+            </div>
         </div>
 
         <button id="botao-girar">GIRAR</button>
 
-        <div id="resultado-container">
-            <!-- O resultado aparecerá aqui -->
-        </div>
+        <div id="resultado-container"></div>
     </div>
 
-    <!-- PARTE 3: A INTERATIVIDADE (JAVASCRIPT) -->
     <script>
         const roleta = document.getElementById('roleta');
         const botaoGirar = document.getElementById('botao-girar');
@@ -161,32 +145,36 @@
         // ==========================================================
         // ====>   VOCÊ PODE EDITAR AS OPÇÕES DE COMIDA AQUI   <====
         // ==========================================================
+        // Coloquei as opções da sua imagem como exemplo inicial.
         const opcoesDeComida = [
-            'Pizza', 'Hambúrguer', 'Sushi Vegetariano', 'Poke', 
-            'Macarrãozinho', 'Árabe', 'Gourmet', 'Quitanda'
+            'Poke', 'Sushi Vegetariano', 'Hambúrguer', 'Pizza', 'Quitanda', 'Gourmet', 'Árabe', 'Macarrãozinho'
         ];
         
+        // Cores baseadas na sua imagem
         const cores = [
-            '#e74c3c', '#f1c40f', '#3498db', '#2ecc71', 
-            '#9b59b6', '#e67e22', '#1abc9c', '#34495e'
+            '#e67e22', '#9b59b6', '#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#34495e', '#1abc9c'
         ];
 
         function criarRoleta() {
-            const anguloPorOpcao = 360 / opcoesDeComida.length;
+            const numOpcoes = opcoesDeComida.length;
+            const anguloPorOpcao = 360 / numOpcoes;
             let gradiente = 'conic-gradient(';
+            
             roleta.innerHTML = '';
             
             opcoesDeComida.forEach((opcao, i) => {
                 const cor = cores[i % cores.length];
                 const anguloInicial = i * anguloPorOpcao;
-                const anguloFinal = (i + 1) * anguloPorOpcao;
-
+                const anguloFinal = anguloInicial + anguloPorOpcao;
+                
                 gradiente += `${cor} ${anguloInicial}deg ${anguloFinal}deg, `;
                 
+                // Cria o elemento de texto para a opção
                 const elementoOpcao = document.createElement('div');
                 elementoOpcao.classList.add('opcao');
-                elementoOpcao.style.setProperty('--angulo-fatia', `${anguloPorOpcao}deg`);
-                elementoOpcao.style.transform = `rotate(${anguloInicial}deg) rotate(calc(var(--angulo-fatia) / 2)) skewY(calc(90deg - var(--angulo-fatia)))`;
+                // O ângulo de rotação do texto é o meio da sua fatia
+                const anguloTexto = anguloInicial + (anguloPorOpcao / 2);
+                elementoOpcao.style.setProperty('--angulo', `${anguloTexto}deg`);
                 elementoOpcao.textContent = opcao;
                 roleta.appendChild(elementoOpcao);
             });
@@ -203,10 +191,8 @@
             girando = true;
             botaoGirar.disabled = true;
             resultadoContainer.style.opacity = 0;
-            resultadoContainer.textContent = '';
             
-            const anguloPorOpcao = 360 / opcoesDeComida.length;
-            const voltasExtras = 360 * 6;
+            const voltasExtras = 360 * 5;
             const anguloAleatorio = Math.floor(Math.random() * 360);
             
             rotacaoAtual += voltasExtras + anguloAleatorio;
@@ -214,9 +200,18 @@
             roleta.style.transform = `rotate(${rotacaoAtual}deg)`;
 
             setTimeout(() => {
+                // 3. CORREÇÃO: Nova fórmula para calcular o vencedor com precisão
+                const anguloPorOpcao = 360 / opcoesDeComida.length;
                 const anguloFinal = rotacaoAtual % 360;
-                const anguloNormalizado = (360 - anguloFinal + (anguloPorOpcao / 2)) % 360;
-                const indiceVencedor = Math.floor(anguloNormalizado / anguloPorOpcao);
+                
+                // O ponteiro está no topo (270 graus no círculo trigonométrico)
+                const anguloDoPonteiro = 270;
+                
+                // Calcula qual ângulo da roleta parou sob o ponteiro
+                const anguloVencedor = (360 - anguloFinal + anguloDoPonteiro) % 360;
+                
+                // Encontra o índice correspondente no array
+                const indiceVencedor = Math.floor(anguloVencedor / anguloPorOpcao);
                 const opcaoVencedora = opcoesDeComida[indiceVencedor];
                 
                 resultadoContainer.textContent = `A escolha é... ${opcaoVencedora}!`;
@@ -224,9 +219,11 @@
 
                 botaoGirar.disabled = false;
                 girando = false;
-            }, 5000);
+
+            }, 5000); // 5000ms = 5 segundos (mesmo tempo da transição no CSS)
         });
 
+        // Inicia a roleta
         criarRoleta();
     </script>
 
