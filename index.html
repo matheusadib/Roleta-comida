@@ -1,0 +1,234 @@
+<!-- CÓDIGO COMPLETO PARA O ARQUIVO index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Que Comer Hoje?</title>
+    <!-- Importando uma fonte moderna do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* PARTE 1: O DESIGN (CSS) */
+        
+        /* Estilos gerais da página */
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Contêiner principal do aplicativo */
+        .app-container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .roleta-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        #roleta {
+            width: 100%;
+            height: 100%;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2) inset;
+            transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+        }
+        
+        .opcao {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 50%;
+            width: 50%;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transform: rotate(calc(var(--angulo-fatia) / 2)) skewY(calc(90deg - var(--angulo-fatia)));
+            padding-right: 20px;
+            pointer-events: none; /* Evita que o texto interfira com cliques */
+        }
+        
+        .ponteiro {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 35px solid #d35400;
+            z-index: 10;
+            filter: drop-shadow(0 -3px 2px rgba(0,0,0,0.2));
+        }
+
+        #botao-girar {
+            margin-top: 40px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(44, 130, 201, 0.4);
+        }
+
+        #botao-girar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(44, 130, 201, 0.5);
+        }
+
+        #botao-girar:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(44, 130, 201, 0.4);
+        }
+        
+        #botao-girar:disabled {
+            background: #bdc3c7;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+        
+        #resultado-container {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 600;
+            color: #d35400;
+            height: 30px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PARTE 2: A ESTRUTURA (HTML) -->
+    <div class="app-container">
+        <h1>O QUE EU DEVO COMER?</h1>
+
+        <div class="roleta-container">
+            <div id="roleta">
+                <!-- Os nomes das comidas serão inseridos aqui pelo JavaScript -->
+            </div>
+            <div class="ponteiro"></div>
+        </div>
+
+        <button id="botao-girar">GIRAR</button>
+
+        <div id="resultado-container">
+            <!-- O resultado aparecerá aqui -->
+        </div>
+    </div>
+
+    <!-- PARTE 3: A INTERATIVIDADE (JAVASCRIPT) -->
+    <script>
+        const roleta = document.getElementById('roleta');
+        const botaoGirar = document.getElementById('botao-girar');
+        const resultadoContainer = document.getElementById('resultado-container');
+
+        // ==========================================================
+        // ====>   VOCÊ PODE EDITAR AS OPÇÕES DE COMIDA AQUI   <====
+        // ==========================================================
+        const opcoesDeComida = [
+            'Pizza', 'Hambúrguer', 'Sushi Vegetariano', 'Poke', 
+            'Macarrãozinho', 'Árabe', 'Gourmet', 'Quitanda'
+        ];
+        
+        const cores = [
+            '#e74c3c', '#f1c40f', '#3498db', '#2ecc71', 
+            '#9b59b6', '#e67e22', '#1abc9c', '#34495e'
+        ];
+
+        function criarRoleta() {
+            const anguloPorOpcao = 360 / opcoesDeComida.length;
+            let gradiente = 'conic-gradient(';
+            roleta.innerHTML = '';
+            
+            opcoesDeComida.forEach((opcao, i) => {
+                const cor = cores[i % cores.length];
+                const anguloInicial = i * anguloPorOpcao;
+                const anguloFinal = (i + 1) * anguloPorOpcao;
+
+                gradiente += `${cor} ${anguloInicial}deg ${anguloFinal}deg, `;
+                
+                const elementoOpcao = document.createElement('div');
+                elementoOpcao.classList.add('opcao');
+                elementoOpcao.style.setProperty('--angulo-fatia', `${anguloPorOpcao}deg`);
+                elementoOpcao.style.transform = `rotate(${anguloInicial}deg) rotate(calc(var(--angulo-fatia) / 2)) skewY(calc(90deg - var(--angulo-fatia)))`;
+                elementoOpcao.textContent = opcao;
+                roleta.appendChild(elementoOpcao);
+            });
+            
+            roleta.style.backgroundImage = gradiente.slice(0, -2) + ')';
+        }
+
+        let rotacaoAtual = 0;
+        let girando = false;
+
+        botaoGirar.addEventListener('click', () => {
+            if (girando) return;
+            
+            girando = true;
+            botaoGirar.disabled = true;
+            resultadoContainer.style.opacity = 0;
+            resultadoContainer.textContent = '';
+            
+            const anguloPorOpcao = 360 / opcoesDeComida.length;
+            const voltasExtras = 360 * 6;
+            const anguloAleatorio = Math.floor(Math.random() * 360);
+            
+            rotacaoAtual += voltasExtras + anguloAleatorio;
+            
+            roleta.style.transform = `rotate(${rotacaoAtual}deg)`;
+
+            setTimeout(() => {
+                const anguloFinal = rotacaoAtual % 360;
+                const anguloNormalizado = (360 - anguloFinal + (anguloPorOpcao / 2)) % 360;
+                const indiceVencedor = Math.floor(anguloNormalizado / anguloPorOpcao);
+                const opcaoVencedora = opcoesDeComida[indiceVencedor];
+                
+                resultadoContainer.textContent = `A escolha é... ${opcaoVencedora}!`;
+                resultadoContainer.style.opacity = 1;
+
+                botaoGirar.disabled = false;
+                girando = false;
+            }, 5000);
+        });
+
+        criarRoleta();
+    </script>
+
+</body>
+</html>
